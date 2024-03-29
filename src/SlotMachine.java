@@ -47,7 +47,7 @@ public class SlotMachine extends JFrame {
         jackpotMessage.setVisible(false);
         panel.add(jackpotMessage);
 
-        btnAddMoney = new JButton("Add Money");
+        btnAddMoney = new JButton("Adicionar Dinheiro");
         btnAddMoney.setBounds(20, 10, 150, 30);
         panel.add(btnAddMoney);
 
@@ -56,22 +56,22 @@ public class SlotMachine extends JFrame {
         txtAddMoney.setVisible(false);
         panel.add(txtAddMoney);
 
-        btnConfirmAdd = new JButton("Confirm");
+        btnConfirmAdd = new JButton("Confirmar");
         btnConfirmAdd.setBounds(295, 10, 100, 30);
         btnConfirmAdd.setVisible(false);
         panel.add(btnConfirmAdd);
 
-        lblCredit = new JLabel("Credit: R$ " + credit);
+        lblCredit = new JLabel("Saldo: R$ " + credit);
         lblCredit.setBounds(400, 10, 150, 30);
         panel.add(lblCredit);
 
-        btnPlay = new JButton("PLAY (R$1)");
+        btnPlay = new JButton("JOGAR");
         btnPlay.setBounds(145, 455, 250, 65);
         btnPlay.setFont(new Font("Calibri", Font.BOLD, 30));
         btnPlay.setBackground(Color.WHITE);
         panel.add(btnPlay);
 
-        btnEnd = new JButton("End Game");
+        btnEnd = new JButton("ENCERRAR JOGO");
         btnEnd.setBounds(20, 50, 150, 30);
         panel.add(btnEnd);
 
@@ -87,13 +87,13 @@ public class SlotMachine extends JFrame {
             try {
                 int valueToAdd = Integer.parseInt(txtAddMoney.getText());
                 credit += valueToAdd;
-                lblCredit.setText("Credit: R$ " + credit);
+                lblCredit.setText("Saldo: R$ " + credit);
                 txtAddMoney.setText("");
                 txtAddMoney.setVisible(false);
                 btnConfirmAdd.setVisible(false);
                 btnAddMoney.setEnabled(true);
             } catch (NumberFormatException nfe) {
-                JOptionPane.showMessageDialog(null, "Please enter a valid number.");
+                JOptionPane.showMessageDialog(null, "Adicione um valor valido.");
                 btnAddMoney.setEnabled(true);
             }
         });
@@ -102,16 +102,16 @@ public class SlotMachine extends JFrame {
         btnPlay.addActionListener(e -> {
             if (credit >= 1) {
                 credit -= 1;
-                lblCredit.setText("Credit: R$ " + credit);
+                lblCredit.setText("Saldo: R$ " + credit);
                 client.play(); // Chama o método play do Client para jogar
             } else {
-                JOptionPane.showMessageDialog(null, "Insufficient credit, please add money to continue.");
+                JOptionPane.showMessageDialog(null, "Saldo insuficiente.");
             }
         });
 
         // Finalizar o jogo
         btnEnd.addActionListener(e -> {
-            JOptionPane.showMessageDialog(null, "You ended the game with R$ " + credit + " in credit.");
+            JOptionPane.showMessageDialog(null, "Seu jogo foi encerrado com R$ " + credit);
             System.exit(0);
         });
     }
@@ -122,7 +122,6 @@ public class SlotMachine extends JFrame {
         n2.setText(Integer.toString(result2));
         n3.setText(Integer.toString(result3));
 
-        // Verificar se os resultados são 777 ou 111, 222, 333
         if (result1 == 7 && result2 == 7 && result3 == 7) {
             credit += 500;
             jackpotMessage.setVisible(true);
@@ -138,7 +137,7 @@ public class SlotMachine extends JFrame {
         }
 
         // Atualizar o texto do crédito
-        lblCredit.setText("Credit: R$ " + credit);
+        lblCredit.setText("Saldo: R$ " + credit);
     }
 
 }
