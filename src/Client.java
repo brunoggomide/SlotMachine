@@ -10,7 +10,8 @@ public class Client {
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
     private Socket socket;
-    private SlotMachine slotMachine; // Adicione uma referência a SlotMachine
+    private SlotMachine slotMachine;
+    private static final int SHIFT = 3;
 
     public Client() {
         try {
@@ -20,12 +21,9 @@ public class Client {
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             inputStream = new ObjectInputStream(socket.getInputStream());
 
-            // Crie apenas uma instância de SlotMachine
             slotMachine = new SlotMachine(this);
 
-            SwingUtilities.invokeLater(() -> {
-                slotMachine.setVisible(true); // Exiba a instância existente de SlotMachine
-            });
+            SwingUtilities.invokeLater(() -> slotMachine.setVisible(true));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -34,14 +32,47 @@ public class Client {
 
     public void play() {
         try {
-            outputStream.writeObject("PLAY");
-            int[] results = (int[]) inputStream.readObject();
-            System.out.println("Results: " + java.util.Arrays.toString(results));
-            // Atualize os resultados na interface existente de SlotMachine
-            slotMachine.updateResults(results[0], results[1], results[2]);
+            String encryptedMessage = encrypt("PLAY");
+            outputStream.writeObject(encryptedMessage);
+            String encryptedResults = (String) inputStream.readObject();
+            String decryptedResults = decrypt(encryptedResults);
+            System.out.println("Decrypted Results: " + decryptedResults);
+
+            String[] stringResults = decryptedResults.substring(1, decryptedResults.length() - 1).split(", ");
+            int[] intResults = new int[stringResults.length];
+            for (int i = 0; i < stringResults.length; i++) {
+                intResults[i] = Integer.parseInt(stringResults[i].trim());
+            }
+
+            slotMachine.updateResults(intResults[0], intResults[1], intResults[2]);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    private String encrypt(String message) {
+        return shift(message, SHIFT);
+    }
+
+    private String decrypt(String message) {
+        return shift(message, -SHIFT);
+    }
+
+    private String shift(String message, int shift) {
+        StringBuilder result = new StringBuilder();
+        for (char character : message.toCharArray()) {
+            if (character >= ' ' && character <= '~') {
+                int originalAlphabetPosition = character - ' ';
+                int newAlphabetPosition = (originalAlphabetPosition + shift) % ('~' - ' ' + 1);
+                if (newAlphabetPosition < 0)
+                    newAlphabetPosition += ('~' - ' ' + 1);
+                char newCharacter = (char) (' ' + newAlphabetPosition);
+                result.append(newCharacter);
+            } else {
+                result.append(character);
+            }
+        }
+        return result.toString();
     }
 
     public static void main(String[] args) {

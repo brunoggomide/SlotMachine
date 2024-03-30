@@ -8,6 +8,7 @@ public class ClientHandler implements Runnable {
     private Socket clientSocket;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
+    private static final int SHIFT = 3;
 
     public ClientHandler(Socket clientSocket) {
         this.clientSocket = clientSocket;
@@ -24,10 +25,15 @@ public class ClientHandler implements Runnable {
         try {
             while (true) {
                 Object request = inputStream.readObject();
-                if (request instanceof String && ((String) request).equals("PLAY")) {
-                    int[] results = playSlotMachine();
-                    System.out.println("Results sent to client: " + java.util.Arrays.toString(results));
-                    outputStream.writeObject(results);
+                if (request instanceof String) {
+                    String decryptedMessage = decrypt((String) request);
+                    if (decryptedMessage.equals("PLAY")) {
+                        int[] results = playSlotMachine();
+                        String encryptedMessage = encrypt(java.util.Arrays.toString(results));
+                        System.out.println("results: " + java.util.Arrays.toString(results));
+                        System.out.println("Encrypted results sent to client: " + encryptedMessage);
+                        outputStream.writeObject(encryptedMessage);
+                    }
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
@@ -50,5 +56,30 @@ public class ClientHandler implements Runnable {
             results[i] = random.nextInt(7);
         }
         return results;
+    }
+
+    private String encrypt(String message) {
+        return shift(message, SHIFT);
+    }
+
+    private String decrypt(String message) {
+        return shift(message, -SHIFT);
+    }
+
+    private String shift(String message, int shift) {
+        StringBuilder result = new StringBuilder();
+        for (char character : message.toCharArray()) {
+            if (character >= ' ' && character <= '~') {
+                int originalAlphabetPosition = character - ' ';
+                int newAlphabetPosition = (originalAlphabetPosition + shift) % ('~' - ' ' + 1);
+                if (newAlphabetPosition < 0)
+                    newAlphabetPosition += ('~' - ' ' + 1);
+                char newCharacter = (char) (' ' + newAlphabetPosition);
+                result.append(newCharacter);
+            } else {
+                result.append(character);
+            }
+        }
+        return result.toString();
     }
 }

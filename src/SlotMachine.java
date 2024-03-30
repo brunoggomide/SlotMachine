@@ -2,11 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SlotMachine extends JFrame {
-    private Client client; // Referência ao cliente para comunicação com o servidor
+    private Client client;
     private JLabel n1, n2, n3, lblCredit, jackpotMessage;
     private JButton btnPlay, btnAddMoney, btnConfirmAdd, btnEnd;
     private JTextField txtAddMoney;
-    private int credit = 0; // Crédito do usuário
+    private int credit = 0;
 
     public SlotMachine(Client client) {
         this.client = client;
@@ -23,7 +23,6 @@ public class SlotMachine extends JFrame {
         setContentPane(panel);
         panel.setLayout(null);
 
-        // Configurações dos elementos de interface
         n1 = new JLabel("0");
         n1.setBounds(55, 230, 150, 200);
         n1.setFont(new Font("Calibri", Font.BOLD, 200));
@@ -75,14 +74,12 @@ public class SlotMachine extends JFrame {
         btnEnd.setBounds(20, 50, 150, 30);
         panel.add(btnEnd);
 
-        // Adicionar ação para o botão de adicionar dinheiro
         btnAddMoney.addActionListener(e -> {
             txtAddMoney.setVisible(true);
             btnConfirmAdd.setVisible(true);
             btnAddMoney.setEnabled(false);
         });
 
-        // Confirmar adição de dinheiro
         btnConfirmAdd.addActionListener(e -> {
             try {
                 int valueToAdd = Integer.parseInt(txtAddMoney.getText());
@@ -98,18 +95,16 @@ public class SlotMachine extends JFrame {
             }
         });
 
-        // Ação para o botão PLAY
         btnPlay.addActionListener(e -> {
             if (credit >= 1) {
                 credit -= 1;
                 lblCredit.setText("Saldo: R$ " + credit);
-                client.play(); // Chama o método play do Client para jogar
+                client.play();
             } else {
                 JOptionPane.showMessageDialog(null, "Saldo insuficiente.");
             }
         });
 
-        // Finalizar o jogo
         btnEnd.addActionListener(e -> {
             JOptionPane.showMessageDialog(null, "Seu jogo foi encerrado com R$ " + credit);
             System.exit(0);
@@ -136,7 +131,6 @@ public class SlotMachine extends JFrame {
             jackpotMessage.setVisible(true);
         }
 
-        // Atualizar o texto do crédito
         lblCredit.setText("Saldo: R$ " + credit);
     }
 
